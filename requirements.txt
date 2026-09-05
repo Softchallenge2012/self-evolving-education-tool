@@ -1,0 +1,6 @@
+flask
+langchain-google-genai
+langchain-chroma
+langchain-core
+chromadb
+matplotlib

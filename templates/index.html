@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Item Workbench</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --paper: #efe9dd;
+      --paper-raised: #f6f2e8;
+      --ink: #20283b;
+      --ink-soft: #5a6072;
+      --rule: #c9beaa;
+      --pen-red: #a5333f;
+      --pen-red-soft: #e3c6c6;
+      --pen-green: #3f6c51;
+      --focus: #1f4f8f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Source Serif 4", serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    header {
+      padding: 2.2rem 2.5rem 1.4rem;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    header h1 {
+      margin: 0 0 .3rem;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: -.01em;
+    }
+
+    header p {
+      margin: 0;
+      color: var(--ink-soft);
+      font-size: 1.05rem;
+      max-width: 60ch;
+    }
+
+    main {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: calc(100vh - 118px);
+    }
+
+    .col {
+      padding: 2.2rem 2.5rem;
+    }
+
+    .col-left {
+      border-right: 2px solid var(--ink);
+    }
+
+    .col-left,
+    .col-right {
+      display: flex;
+      flex-direction: column;
+      gap: 1.6rem;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin: 0 0 .1rem;
+      padding-bottom: .5rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    label {
+      display: block;
+      font-size: .92rem;
+      color: var(--ink-soft);
+      margin-bottom: .35rem;
+    }
+
+    .field {
+      margin-bottom: 1rem;
+    }
+
+    .field:last-child {
+      margin-bottom: 0;
+    }
+
+    textarea,
+    input[type=text] {
+      width: 100%;
+      resize: vertical;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: .92rem;
+      line-height: 1.5;
+      color: var(--ink);
+      background: var(--paper-raised);
+      border: 1px solid var(--rule);
+      border-radius: 2px;
+      padding: .65rem .75rem;
+    }
+
+    textarea:focus,
+    input:focus {
+      outline: 2px solid var(--focus);
+      outline-offset: 1px;
+    }
+
+    textarea[readonly] {
+      background: #e7e1d2;
+      color: var(--ink);
+    }
+
+    .concept-field textarea {
+      min-height: 3.4rem;
+    }
+
+    .example-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .9rem;
+      padding: .9rem;
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      background: rgba(255, 255, 255, .25);
+    }
+
+    .example-pair textarea {
+      min-height: 4.5rem;
+    }
+
+    .example-pair .field {
+      margin-bottom: 0;
+    }
+
+    .pair-index {
+      grid-column: 1 / -1;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: .78rem;
+      color: var(--ink-soft);
+    }
+
+    button {
+      font-family: "Source Serif 4", serif;
+      font-weight: 600;
+      font-size: .98rem;
+      padding: .7rem 1.4rem;
+      border: 1.5px solid var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+      border-radius: 2px;
+      cursor: pointer;
+      align-self: flex-start;
+      transition: background .12s ease, color .12s ease;
+    }
+
+    button:hover {
+      background: var(--paper);
+      color: var(--ink);
+    }
+
+    button:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+    }
+
+    button.secondary {
+      background: var(--paper-raised);
+      color: var(--ink);
+    }
+
+    button.secondary:hover {
+      background: var(--ink);
+      color: var(--paper);
+    }
+
+    .generated-block {
+      padding: 1rem;
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      background: rgba(255, 255, 255, .25);
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    #question-box {
+      min-height: 4rem;
+    }
+
+    #answer-box {
+      min-height: 4.5rem;
+    }
+
+    .feedback-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem 1.4rem;
+    }
+
+    .feedback-option {
+      display: flex;
+      align-items: center;
+      gap: .45rem;
+      font-family: "IBM Plex Mono", monospace;
+      font-size: .85rem;
+      color: var(--ink);
+    }
+
+    .feedback-option input[type=radio] {
+      accent-color: var(--pen-red);
+      width: 15px;
+      height: 15px;
+    }
+
+    .status-line {
+      font-family: "IBM Plex Mono", monospace;
+      font-size: .82rem;
+      color: var(--ink-soft);
+      min-height: 1.1rem;
+    }
+
+    .status-line.error {
+      color: var(--pen-red);
+    }
+
+    .status-line.ok {
+      color: var(--pen-green);
+    }
+
+    .plot-frame-wrap {
+      border: 1px solid var(--rule);
+      border-radius: 3px;
+      background: var(--paper-raised);
+      min-height: 340px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .plot-frame-wrap iframe {
+      width: 100%;
+      height: 340px;
+      border: none;
+    }
+
+    .plot-frame-wrap .placeholder {
+      color: var(--ink-soft);
+      font-family: "IBM Plex Mono", monospace;
+      font-size: .85rem;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    @media (max-width: 880px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .col-left {
+        border-right: none;
+        border-bottom: 2px solid var(--ink);
+      }
+
+      .example-pair {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>AI-Assisted Education Platform</h1>
+    <p>Feed a concept and a few worked examples on the left. Draft, grade, and track new test items on the right.</p>
+  </header>
+
+  <main>
+    <!-- LEFT COLUMN: concept + few-shot examples -->
+    <section class="col col-left">
+      <div>
+        <h2>Source material</h2>
+      </div>
+
+      <div class="field concept-field">
+        <label for="concept">Concept</label>
+        <textarea id="concept" placeholder="e.g. Python list comprehensions"></textarea>
+      </div>
+
+      <div class="example-pair">
+        <span class="pair-index">Example 1 (required)</span>
+        <div class="field">
+          <label for="q1">Question</label>
+          <textarea id="q1" placeholder="Example question 1"></textarea>
+        </div>
+        <div class="field">
+          <label for="a1">Answer</label>
+          <textarea id="a1" placeholder="Example answer 1"></textarea>
+        </div>
+      </div>
+
+      <div class="example-pair">
+        <span class="pair-index">Example 2 (required)</span>
+        <div class="field">
+          <label for="q2">Question</label>
+          <textarea id="q2" placeholder="Example question 2"></textarea>
+        </div>
+        <div class="field">
+          <label for="a2">Answer</label>
+          <textarea id="a2" placeholder="Example answer 2"></textarea>
+        </div>
+      </div>
+
+      <div class="example-pair">
+        <span class="pair-index">Example 3 (optional)</span>
+        <div class="field">
+          <label for="q3">Question</label>
+          <textarea id="q3" placeholder="Example question 3"></textarea>
+        </div>
+        <div class="field">
+          <label for="a3">Answer</label>
+          <textarea id="a3" placeholder="Example answer 3"></textarea>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN: generate, grade, visualize -->
+    <section class="col col-right">
+      <div>
+        <h2>Draft &amp; review</h2>
+      </div>
+
+      <button id="generate-btn" type="button">Generate new example</button>
+      <div id="generate-status" class="status-line"></div>
+
+      <div class="generated-block">
+        <div class="field">
+          <label for="question-box">Generated question</label>
+          <textarea id="question-box" readonly placeholder="Nothing generated yet"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Feedback</label>
+          <div class="feedback-group">
+            <label class="feedback-option"><input type="radio" name="feedback" value="acceptable"> Acceptable</label>
+            <label class="feedback-option"><input type="radio" name="feedback" value="too difficult"> Too
+              difficult</label>
+            <label class="feedback-option"><input type="radio" name="feedback" value="too easy"> Too easy</label>
+            <label class="feedback-option"><input type="radio" name="feedback" value="not related"> Not related</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="answer-box">Your answer</label>
+          <textarea id="answer-box" placeholder="Write your answer to the generated question"></textarea>
+        </div>
+
+        <button id="answer-btn" type="button" class="secondary">Submit answer</button>
+        <div id="answer-status" class="status-line"></div>
+      </div>
+
+      <div>
+        <h2>Summary</h2>
+      </div>
+
+      <button id="visual-btn" type="button" class="secondary">Show visual summary</button>
+      <div id="visual-status" class="status-line"></div>
+
+      <div class="plot-frame-wrap">
+        <iframe id="plot-frame" style="display:none;"></iframe>
+        <div id="plot-placeholder" class="placeholder">No summary generated yet. Click "Show visual summary".</div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const generateBtn = document.getElementById('generate-btn');
+    const answerBtn = document.getElementById('answer-btn');
+    const visualBtn = document.getElementById('visual-btn');
+
+    const generateStatus = document.getElementById('generate-status');
+    const answerStatus = document.getElementById('answer-status');
+    const visualStatus = document.getElementById('visual-status');
+
+    const questionBox = document.getElementById('question-box');
+    const answerBox = document.getElementById('answer-box');
+
+    const plotFrame = document.getElementById('plot-frame');
+    const plotPlaceholder = document.getElementById('plot-placeholder');
+
+    function setStatus(el, text, kind) {
+      el.textContent = text;
+      el.className = 'status-line' + (kind ? ' ' + kind : '');
+    }
+
+    function getFewShot() {
+      const concept = document.getElementById('concept').value.trim();
+      const pairs = [['q1', 'a1'], ['q2', 'a2'], ['q3', 'a3']];
+      const questions = [];
+      const answers = [];
+      for (const [qId, aId] of pairs) {
+        const q = document.getElementById(qId).value.trim();
+        const a = document.getElementById(aId).value.trim();
+        if (q && a) {
+          questions.push(q);
+          answers.push(a);
+        }
+      }
+      return { concept, questions, answers };
+    }
+
+    generateBtn.addEventListener('click', async () => {
+      const { concept, questions, answers } = getFewShot();
+
+      if (!concept) {
+        setStatus(generateStatus, 'Enter a concept first.', 'error');
+        return;
+      }
+      if (questions.length < 2) {
+        setStatus(generateStatus, 'Fill in at least 2 matched example question/answer pairs.', 'error');
+        return;
+      }
+
+      generateBtn.disabled = true;
+      setStatus(generateStatus, 'Generating…', '');
+
+      try {
+        const resp = await fetch('/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ concept, questions, answers })
+        });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          setStatus(generateStatus, data.error || 'Generation failed.', 'error');
+          return;
+        }
+
+        questionBox.value = data.question;
+        answerBox.value = '';
+        document.querySelectorAll('input[name=feedback]').forEach(r => r.checked = false);
+
+        const note = data.accepted_on_similarity_check
+          ? `Accepted after ${data.attempts} attempt(s).`
+          : `Stored for review after ${data.attempts} attempt(s) (similarity check did not pass).`;
+        setStatus(generateStatus, note, data.accepted_on_similarity_check ? 'ok' : 'error');
+      } catch (e) {
+        setStatus(generateStatus, 'Network error while generating.', 'error');
+      } finally {
+        generateBtn.disabled = false;
+      }
+    });
+
+    answerBtn.addEventListener('click', async () => {
+      const feedbackEl = document.querySelector('input[name=feedback]:checked');
+      const userAnswer = answerBox.value.trim();
+
+      if (!questionBox.value) {
+        setStatus(answerStatus, 'Generate an example first.', 'error');
+        return;
+      }
+      if (!feedbackEl) {
+        setStatus(answerStatus, 'Select a feedback option.', 'error');
+        return;
+      }
+
+      answerBtn.disabled = true;
+      setStatus(answerStatus, 'Submitting…', '');
+
+      try {
+        const resp = await fetch('/answer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ feedback: feedbackEl.value, user_answer: userAnswer })
+        });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          setStatus(answerStatus, data.error || 'Could not submit answer.', 'error');
+          return;
+        }
+        setStatus(answerStatus, 'Saved.', 'ok');
+      } catch (e) {
+        setStatus(answerStatus, 'Network error while submitting.', 'error');
+      } finally {
+        answerBtn.disabled = false;
+      }
+    });
+
+    visualBtn.addEventListener('click', async () => {
+      visualBtn.disabled = true;
+      setStatus(visualStatus, 'Building summary…', '');
+
+      try {
+        const resp = await fetch('/visual', { method: 'POST' });
+        const data = await resp.json();
+
+        if (!resp.ok) {
+          setStatus(visualStatus, data.error || 'Could not build summary.', 'error');
+          return;
+        }
+
+        plotFrame.src = data.url;
+        plotFrame.style.display = 'block';
+        plotPlaceholder.style.display = 'none';
+        setStatus(visualStatus, 'Updated.', 'ok');
+      } catch (e) {
+        setStatus(visualStatus, 'Network error while building summary.', 'error');
+      } finally {
+        visualBtn.disabled = false;
+      }
+    });
+  </script>
+
+</body>
+
+</html>
