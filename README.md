@@ -13,3 +13,7 @@ The **AI-Assisted Education Platform** (Item Workbench) is built to bridge the f
 * **Streamlined Learning over Heavy Textbooks:** Instead of sifting through massive textbooks, you only need to supply a core concept summary and 2–3 seed examples to activate complete question generation.
 * **Universal Domain Agnostic:** Designed as a general-purpose learning engine suitable for any subject—ranging from Python programming and mathematics to history, medicine, or language studies.
 * **Interactive Draft & Review Cycle:** Instantly generate new test items, grade your responses, track difficulty feedback, and refine problem sets in real time.
+
+**How to run**
+pip install -r requirements.txt
+python app.py
