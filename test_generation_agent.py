@@ -92,7 +92,7 @@ class TestGenerationAgent:
         )
         system = SystemMessage(content=(
             "You are a test-question generator. Given a concept and a few example "
-            "question/answer pairs, produce ONE new question and its correct answer "
+            "question/answer pairs, user the concept as a context to produce ONE new question and its correct answer "
             "that tests the same concept. The new question must not duplicate any "
             "example. Respond with STRICT JSON only, no markdown fences, in the form:\n"
             '{"question": "...", "answer": "..."}'
@@ -419,6 +419,10 @@ if __name__ == "__main__":
             "question": "Write a comprehension that squares even numbers from 0 to 10.",
             "answer": "[x**2 for x in range(11) if x % 2 == 0]",
         },
+        {
+            "question": "What is the result of `[s.upper() for s in ['python', 'is', 'fun'] if len(s) > 2]`?",
+            "answer": "['PYTHON', 'FUN']"
+        }
     ]
 
     result = agent.generate_example("Python list comprehensions", few_shot)
