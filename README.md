@@ -15,5 +15,7 @@ The **AI-Assisted Education Platform** (Item Workbench) is built to bridge the f
 * **Interactive Draft & Review Cycle:** Instantly generate new test items, grade your responses, track difficulty feedback, and refine problem sets in real time.
 
 **How to run**
+
 pip install -r requirements.txt
+
 python app.py
